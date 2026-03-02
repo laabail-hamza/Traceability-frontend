@@ -31,9 +31,27 @@ function LotForm() {
     try {
       await axios.post("http://localhost:8080/api/lots", formData);
       alert("Lot créé avec succès !");
-      setFormData(initialState);
+      setFormData(initialState); // Reset inputs
     } catch (error) {
       alert("Erreur lors de la création du lot");
+    }
+  };
+
+  // ✅ FONCTION EXPORT EN DEHORS
+  const downloadLots = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/api/lots/export");
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "lots.xlsx";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (error) {
+      console.error("Erreur téléchargement:", error);
     }
   };
 
@@ -44,8 +62,7 @@ function LotForm() {
 
         <form onSubmit={handleSubmit} className="form">
 
-          <input name="lotCode" placeholder="Lot Code"
-            value={formData.lotCode} onChange={handleChange} required />
+        
 
           <input name="productName" placeholder="Nom Produit"
             value={formData.productName} onChange={handleChange} required />
@@ -73,7 +90,19 @@ function LotForm() {
               value={formData.unit} onChange={handleChange} required />
           </div>
 
-          <button type="submit">Créer Lot</button>
+          <div className="button-group">
+  <button type="submit" className="create-btn">
+    Créer Lot
+  </button>
+
+  <button
+    type="button"
+    onClick={downloadLots}
+    className="download-btn"
+  >
+    Télécharger les lots
+  </button>
+</div>
 
         </form>
       </div>

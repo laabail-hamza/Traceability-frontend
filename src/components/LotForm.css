@@ -65,3 +65,39 @@ button:hover {
   background: #1e3c72;
   transform: translateY(-2px);
 }
+
+.button-group {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.button-group button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* Bouton créer */
+.create-btn {
+  background-color: #2e7d32;
+  color: white;
+}
+
+.create-btn:hover {
+  background-color: #1b5e20;
+}
+
+/* Bouton télécharger */
+.download-btn {
+  background-color: #1565c0;
+  color: white;
+}
+
+.download-btn:hover {
+  background-color: #0d47a1;
+}
