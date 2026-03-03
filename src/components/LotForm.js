@@ -1,113 +1,216 @@
 import React, { useState } from "react";
-import axios from "axios";
-import "./LotForm.css";
+import API from "../api";
+import "../styles.css";
 
-function LotForm() {
+function TraceabilityForm() {
+  const [formData, setFormData] = useState({
+    // PRODUCT
+    gtin: "",
+    description: "",
+    commercialLot: "",
+    sanitaryLot: "",
+    quantity: "",
+    unit: "",
 
-  const initialState = {
-    lotCode: "",
-    productName: "",
-    variety: "",
-    productDescription: "",
+    // PRODUCTION
+    countryOfOrigin: "",
+    productionSiteName: "",
+    productionSiteAddress: "",
+    sanitaryApprovalNumber: "",
+    productionDate: "",
     harvestDate: "",
-    farmName: "",
-    farmAddress: "",
-    totalQuantity: "",
-    unit: ""
-  };
 
-  const [formData, setFormData] = useState(initialState);
+    // SHIPPING
+    shipperName: "",
+    shipperAddress: "",
+    shipperGLN: "",
+    shippingDateTime: "",
+    transportMode: "",
+    transportTemperature: "",
+  });
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      await axios.post("http://localhost:8080/api/lots", formData);
-      alert("Lot créé avec succès !");
-      setFormData(initialState); // Reset inputs
+      await API.post("", formData);
+      alert("Record created successfully ✅");
+
+      // Reset form
+      setFormData({
+        gtin: "",
+        description: "",
+        commercialLot: "",
+        sanitaryLot: "",
+        quantity: "",
+        unit: "",
+        countryOfOrigin: "",
+        productionSiteName: "",
+        productionSiteAddress: "",
+        sanitaryApprovalNumber: "",
+        productionDate: "",
+        harvestDate: "",
+        shipperName: "",
+        shipperAddress: "",
+        shipperGLN: "",
+        shippingDateTime: "",
+        transportMode: "",
+        transportTemperature: "",
+      });
     } catch (error) {
-      alert("Erreur lors de la création du lot");
+      alert("Error creating record ❌");
     }
   };
 
-  // ✅ FONCTION EXPORT EN DEHORS
-  const downloadLots = async () => {
+  const handleDownload = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/lots/export");
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+      const response = await API.get("/export/excel", {
+        responseType: "blob",
+      });
 
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "lots.xlsx";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "traceability.xlsx");
+      document.body.appendChild(link);
+      link.click();
     } catch (error) {
-      console.error("Erreur téléchargement:", error);
+      alert("Download failed ❌");
     }
   };
 
   return (
     <div className="container">
-      <div className="card">
-        <h2>FSMA - Création Lot Légumes</h2>
+      <h2>Traceability Management System</h2>
 
-        <form onSubmit={handleSubmit} className="form">
+      <form onSubmit={handleSubmit} className="form-card">
 
-        
+        {/* PRODUCT SECTION */}
+        <h3>Product Information</h3>
+<div className="form-grid">
 
-          <input name="productName" placeholder="Nom Produit"
-            value={formData.productName} onChange={handleChange} required />
+  <div className="form-group">
+    <label>GTIN</label>
+    <input name="gtin" value={formData.gtin} onChange={handleChange} />
+  </div>
 
-          <input name="variety" placeholder="Variété"
-            value={formData.variety} onChange={handleChange} required />
+  <div className="form-group">
+    <label>Description</label>
+    <input name="description" value={formData.description} onChange={handleChange} />
+  </div>
 
-          <input name="productDescription" placeholder="Description"
-            value={formData.productDescription} onChange={handleChange} required />
+  <div className="form-group">
+    <label>Commercial Lot</label>
+    <input name="commercialLot" value={formData.commercialLot} onChange={handleChange} />
+  </div>
 
-          <input type="date" name="harvestDate"
-            value={formData.harvestDate} onChange={handleChange} required />
+  <div className="form-group">
+    <label>Sanitary Lot</label>
+    <input name="sanitaryLot" value={formData.sanitaryLot} onChange={handleChange} />
+  </div>
 
-          <input name="farmName" placeholder="Nom Ferme"
-            value={formData.farmName} onChange={handleChange} required />
+  <div className="form-group">
+    <label>Quantity</label>
+    <input type="number" name="quantity" value={formData.quantity} onChange={handleChange} />
+  </div>
 
-          <input name="farmAddress" placeholder="Adresse Ferme"
-            value={formData.farmAddress} onChange={handleChange} required />
+  <div className="form-group">
+    <label>Unit</label>
+    <input name="unit" value={formData.unit} onChange={handleChange} />
+  </div>
 
-          <div className="row">
-            <input type="number" name="totalQuantity" placeholder="Quantité"
-              value={formData.totalQuantity} onChange={handleChange} required />
-
-            <input name="unit" placeholder="Unité (kg/cartons)"
-              value={formData.unit} onChange={handleChange} required />
-          </div>
-
-          <div className="button-group">
-  <button type="submit" className="create-btn">
-    Créer Lot
-  </button>
-
-  <button
-    type="button"
-    onClick={downloadLots}
-    className="download-btn"
-  >
-    Télécharger les lots
-  </button>
 </div>
 
-        </form>
-      </div>
+        {/* PRODUCTION SECTION */}
+     <h3>Production Information</h3>
+<div className="form-grid">
+
+  <div className="form-group">
+    <label>Country of Origin</label>
+    <input name="countryOfOrigin" value={formData.countryOfOrigin} onChange={handleChange} />
+  </div>
+
+  <div className="form-group">
+    <label>Production Site Name</label>
+    <input name="productionSiteName" value={formData.productionSiteName} onChange={handleChange} />
+  </div>
+
+  <div className="form-group">
+    <label>Production Site Address</label>
+    <input name="productionSiteAddress" value={formData.productionSiteAddress} onChange={handleChange} />
+  </div>
+
+  <div className="form-group">
+    <label>Sanitary Approval Number</label>
+    <input name="sanitaryApprovalNumber" value={formData.sanitaryApprovalNumber} onChange={handleChange} />
+  </div>
+
+  <div className="form-group">
+    <label>Production Date</label>
+    <input type="date" name="productionDate" value={formData.productionDate} onChange={handleChange} />
+  </div>
+
+  <div className="form-group">
+    <label>Harvest Date</label>
+    <input type="date" name="harvestDate" value={formData.harvestDate} onChange={handleChange} />
+  </div>
+
+</div>
+
+        {/* SHIPPING SECTION */}
+        <h3>Shipping Information</h3>
+<div className="form-grid">
+
+  <div className="form-group">
+    <label>Shipper Name</label>
+    <input name="shipperName" value={formData.shipperName} onChange={handleChange} />
+  </div>
+
+  <div className="form-group">
+    <label>Shipper Address</label>
+    <input name="shipperAddress" value={formData.shipperAddress} onChange={handleChange} />
+  </div>
+
+  <div className="form-group">
+    <label>Shipper GLN</label>
+    <input name="shipperGLN" value={formData.shipperGLN} onChange={handleChange} />
+  </div>
+
+  <div className="form-group">
+    <label>Shipping Date & Time</label>
+    <input type="datetime-local" name="shippingDateTime" value={formData.shippingDateTime} onChange={handleChange} />
+  </div>
+
+  <div className="form-group">
+    <label>Transport Mode</label>
+    <input name="transportMode" value={formData.transportMode} onChange={handleChange} />
+  </div>
+
+  <div className="form-group">
+    <label>Transport Temperature (°C)</label>
+    <input type="number" step="0.1" name="transportTemperature" value={formData.transportTemperature} onChange={handleChange} />
+  </div>
+
+</div>
+        <div className="button-row">
+          <button type="submit" className="btn primary">
+            Create Record
+          </button>
+
+          <button type="button" onClick={handleDownload} className="btn secondary">
+            Download Excel
+          </button>
+        </div>
+
+      </form>
     </div>
   );
 }
 
-export default LotForm;
+export default TraceabilityForm;
